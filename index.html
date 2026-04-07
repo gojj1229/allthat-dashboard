@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>K-Travel AI Snapshot | 관리자 대시보드 (최종 고도화 v2.3)</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<style>
+		@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+		
+		body { 
+			font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; 
+			background-color: #f2f4f6; 
+			color: #333d4b; 
+		}
+		
+		.toss-card { 
+			background: white; 
+			border-radius: 24px; 
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); 
+			padding: 28px; 
+			transition: transform 0.2s ease;
+		}
+		.toss-card:hover { transform: translateY(-2px); }
+
+		.text-toss-dark { color: #191f28; } 
+		.text-toss-gray { color: #8b95a1; } 
+		.text-toss-blue { color: #3182f6; } 
+		.bg-toss-blue-light { background-color: #e8f3ff; }
+
+		/* Tooltip Animation */
+		.tooltip-content {
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(10px);
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+		.toss-card.group:hover {
+			z-index: 50;
+		}
+		.group:hover .tooltip-content {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+		}
+	</style>
+</head>
+<body class="antialiased p-4 md:p-10 max-w-[1400px] mx-auto">
+
+	<header class="mb-10 mt-4 flex flex-col xl:flex-row xl:justify-between xl:items-end gap-6 relative z-40">
+		<div>
+			<p class="text-[18px] font-semibold text-toss-blue mb-1">올댓아이앤씨 AI Snapshot Admin</p>
+			<h1 class="text-4xl md:text-5xl font-bold text-toss-dark tracking-tight">강원도 캠페인 성과 보고서</h1>
+		</div>
+		
+		<div class="flex flex-wrap items-center gap-3">
+			<div class="bg-white px-5 py-3.5 rounded-[16px] shadow-sm border border-gray-100 flex items-center cursor-pointer hover:bg-gray-50 transition">
+				<span class="text-[18px] font-semibold text-toss-dark">📅 2026.04.01 ~ 2026.04.30</span>
+				<svg class="w-5 h-5 ml-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+			</div>
+			
+			<div class="relative group">
+				<button class="bg-[#191f28] hover:bg-[#333d4b] text-white px-6 py-3.5 rounded-[16px] shadow-sm flex items-center transition font-semibold text-[18px]">
+					<svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+					월간 보고서 다운로드
+					<svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+				</button>
+				<div class="absolute right-0 mt-2 w-56 bg-white rounded-[16px] shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden">
+					<a href="#" class="block px-5 py-4 text-[16px] font-medium text-gray-700 hover:bg-toss-blue hover:text-white transition-colors border-b border-gray-50 flex items-center justify-between">
+						PDF 파일 <span>.pdf</span>
+					</a>
+					<a href="#" class="block px-5 py-4 text-[16px] font-medium text-gray-700 hover:bg-toss-blue hover:text-white transition-colors border-b border-gray-50 flex items-center justify-between">
+						Word 문서 <span>.docx</span>
+					</a>
+					<a href="#" class="block px-5 py-4 text-[16px] font-medium text-gray-700 hover:bg-toss-blue hover:text-white transition-colors border-b border-gray-50 flex items-center justify-between">
+						Markdown <span>.md</span>
+					</a>
+					<a href="#" class="block px-5 py-4 text-[16px] font-medium text-gray-700 hover:bg-toss-blue hover:text-white transition-colors flex items-center justify-between">
+						Text 파일 <span>.txt</span>
+					</a>
+				</div>
+			</div>
+		</div>
+	</header>
+
+	<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8 relative z-20">
+		
+		<div class="toss-card flex flex-col justify-between relative min-h-[180px]">
+			<h3 class="text-[18px] font-medium text-toss-gray">캠페인 참여 (AI 누적 합성)</h3>
+			<div class="mt-4">
+				<div class="flex items-end gap-1">
+					<p class="text-6xl font-bold text-toss-dark tracking-tight">12,458</p>
+					<span class="text-[20px] font-medium text-toss-gray mb-1.5">건</span>
+				</div>
+				<p class="text-[16px] font-medium text-[#12b886] mt-3 flex items-center">
+					<svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+					전월 대비 24% 증가
+				</p>
+			</div>
+		</div>
+
+		<div class="toss-card flex flex-col justify-between relative min-h-[180px]">
+			<h3 class="text-[18px] font-medium text-toss-gray">SNS 바이럴 공유</h3>
+			<div class="mt-4">
+				<div class="flex items-end gap-1">
+					<p class="text-6xl font-bold text-toss-dark tracking-tight">8,230</p>
+					<span class="text-[20px] font-medium text-toss-gray mb-1.5">회</span>
+				</div>
+				<div class="flex items-center gap-2 mt-4 text-[15px] font-semibold text-toss-gray">
+					<span class="bg-[#fee500] text-[#3c1e1e] px-3 py-1 rounded-md">카카오톡 60%</span>
+					<span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-md">인스타그램 35%</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="toss-card flex flex-col justify-between relative min-h-[180px]">
+			<h3 class="text-[18px] font-medium text-toss-gray">공식 채널/길안내 전환수</h3>
+			<div class="mt-4">
+				<div class="flex items-end gap-1">
+					<p class="text-6xl font-bold text-toss-dark tracking-tight">3,102</p>
+					<span class="text-[20px] font-medium text-toss-gray mb-1.5">클릭</span>
+				</div>
+				<div class="flex items-center gap-2 mt-4 text-[15px] font-medium text-toss-gray">
+					<span class="border border-gray-200 px-3 py-1 rounded-md">지도/네비(45%)</span>
+					<span class="border border-gray-200 px-3 py-1 rounded-md">축제예매(30%)</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="toss-card bg-toss-blue-light border-none relative flex flex-col justify-between group cursor-help transition-all p-[32px] min-h-[180px]">
+			<div class="flex justify-between items-start">
+				<h3 class="text-[18px] font-semibold text-toss-blue flex items-center">
+					추정 경제 유발 효과
+					<svg class="w-5 h-5 ml-1 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+				</h3>
+			</div>
+			
+			<div class="mt-4 flex flex-col">
+				<div class="flex items-end gap-1">
+					<p class="text-6xl font-bold text-toss-blue tracking-tight">1.5</p>
+					<span class="text-[22px] font-bold text-toss-blue mb-1.5">억원</span>
+				</div>
+			</div>
+
+			<div class="tooltip-content absolute top-[95%] left-0 mt-4 w-[110%] min-w-[320px] bg-[#191f28] text-white p-7 rounded-[16px] shadow-[0_10px_40px_rgba(0,0,0,0.2)] z-50 pointer-events-none">
+				<p class="text-[16px] font-bold text-gray-300 mb-4">[산출 근거 : 한국관광공사 통계 적용]</p>
+				<ul class="text-[17px] space-y-3 text-gray-400">
+					<li class="flex justify-between"><span>길안내 전환 방문자:</span> <span class="text-white">3,102명</span></li>
+					<li class="flex justify-between"><span>강원도 평균 객단가:</span> <span class="text-white">164,000원</span></li>
+					<li class="flex justify-between border-b border-gray-700 pb-3"><span>전환율 보정 (보수적):</span> <span class="text-white">30%</span></li>
+					<li class="flex justify-between pt-2 font-bold text-toss-blue text-[19px]"><span>최종 추산액:</span> <span>약 1.52억 원</span></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-8 relative z-10">
+		<div class="toss-card lg:col-span-2 relative">
+			<div class="flex justify-between items-center mb-6">
+				<h2 class="text-[24px] font-bold text-toss-dark">📍 명소별 실시간 유입 현황</h2>
+			</div>
+			<div class="relative h-[300px]">
+				<canvas id="hotspotChart"></canvas>
+			</div>
+		</div>
+		
+		<div class="toss-card relative">
+			<h2 class="text-[24px] font-bold text-toss-dark mb-6">👥 방문자 데모그래픽</h2>
+			<div class="relative h-[240px] flex justify-center items-center">
+				<canvas id="demographicsChart"></canvas>
+			</div>
+			
+			<div class="mt-8 bg-gray-50 p-5 rounded-[16px] text-center border border-gray-100">
+				<p class="text-[17px] font-medium leading-relaxed text-[#4e5968]">
+					AI 안면 인식 기술을 활용하여 <br>
+					<strong class="text-toss-blue">개인 식별 없이 익명화</strong> 처리된<br> 
+					방문자의 연령 및 성별 추정 데이터입니다.
+				</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-10 relative z-10">
+		
+		<div class="toss-card">
+			<h2 class="text-[24px] font-bold text-toss-dark mb-6">💡 AI 마케팅 인사이트 및 제언</h2>
+			<div class="flex flex-col gap-4">
+				<div class="bg-[#f9fafb] p-7 rounded-[20px] border border-gray-100 flex justify-between items-center gap-6">
+					<div>
+						<h4 class="text-[20px] font-bold text-toss-dark mb-3">타겟 프로모션 전환</h4>
+						<p class="text-[18px] text-[#4e5968] leading-relaxed">
+							현재 '양양 서피비치'의 20대 유입이 급증했습니다. <br><strong class="text-[#f04452]">청년 지원금 캠페인 배너</strong>를 결과물 하단에 노출할까요?
+						</p>
+					</div>
+					<button class="shrink-0 bg-toss-blue text-white text-[18px] font-semibold px-7 py-4 rounded-[12px] hover:bg-blue-600 transition shadow-sm">
+						원클릭 적용
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div class="toss-card bg-[#f8fcf9] border border-[#d3f9d8]">
+			<div class="flex justify-between items-center mb-6">
+				<h2 class="text-[24px] font-bold text-[#087f5b] flex items-center">
+					<svg class="w-8 h-8 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+					Zero-Log 개인정보 파기 감사 로그
+				</h2>
+				<span class="flex items-center text-[16px] font-bold text-[#12b886] bg-[#e6fcf5] px-4 py-2 rounded-md">
+					<span class="w-2.5 h-2.5 bg-[#12b886] rounded-full mr-2.5 animate-pulse"></span>
+					실시간 감시 중
+				</span>
+			</div>
+			
+			<div class="space-y-5">
+				<div class="bg-white p-7 rounded-[16px] flex justify-between items-center shadow-sm">
+					<div class="text-[19px]">
+						<p class="font-bold text-toss-dark">원본 안면 데이터 파기 건수</p>
+						<p class="text-[16px] text-toss-gray mt-1.5">서버 임시 폴더 자동 삭제 (3초 이내)</p>
+					</div>
+					<div class="text-right">
+						<p class="text-[28px] font-bold text-[#087f5b]">12,458 건</p>
+						<p class="text-[17px] font-semibold text-toss-gray mt-1.5">파기율 <span class="text-toss-blue">100%</span></p>
+					</div>
+				</div>
+				<p class="text-[15px] text-[#868e96] px-2 leading-relaxed">
+					* 본 시스템은 개인정보보호법 제21조(개인정보의 파기)를 엄격히 준수하며, 합성 결과물 외 어떠한 생체/이미지 데이터도 서버에 남기지 않음을 증명합니다.
+				</p>
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+		Chart.defaults.font.family = "'Pretendard', sans-serif";
+		Chart.defaults.color = '#8b95a1';
+		/* 차트 내부 라벨 폰트 사이즈 추가 확대 */
+		Chart.defaults.font.size = 18; 
+
+		// Hotspot Chart (Bar)
+		const ctxHotspot = document.getElementById('hotspotChart').getContext('2d');
+		new Chart(ctxHotspot, {
+			type: 'bar',
+			data: {
+				labels: ['양양 서피비치', '평창 양떼목장', '강릉 안목해변', '속초 영금정', '춘천 남이섬'],
+				datasets: [{
+					label: '유입/합성수',
+					data: [4200, 3100, 2500, 1800, 858],
+					backgroundColor: '#3182f6',
+					borderRadius: 8,
+					barThickness: 36
+				}]
+			},
+			options: { 
+				responsive: true, 
+				maintainAspectRatio: false,
+				plugins: { legend: { display: false } },
+				scales: {
+					x: { grid: { display: false }, ticks: { font: { size: 18, weight: '500' } } },
+					y: { grid: { borderDash: [5, 5] }, beginAtZero: true, ticks: { font: { size: 16 } } }
+				}
+			}
+		});
+
+		// Demographics Chart (Doughnut)
+		const ctxDemo = document.getElementById('demographicsChart').getContext('2d');
+		new Chart(ctxDemo, {
+			type: 'doughnut',
+			data: {
+				labels: ['20대 여성', '20대 남성', '30대 가족', '40대 이상', '기타'],
+				datasets: [{
+					data: [45, 20, 25, 8, 2],
+					backgroundColor: ['#ff8a9f', '#3182f6', '#34c759', '#ffb340', '#e5e8eb'],
+					borderWidth: 0,
+					hoverOffset: 4
+				}]
+			},
+			options: { 
+				responsive: true, 
+				maintainAspectRatio: false,
+				cutout: '70%',
+				plugins: {
+					legend: { position: 'right', labels: { usePointStyle: true, font: { size: 18 }, padding: 20 } }
+				}
+			}
+		});
+	</script>
+</body>
+</html>
